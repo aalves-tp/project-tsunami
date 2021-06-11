@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     [Header("Physics and Collisions")]
     public float rampGravity;
     public float rampAcceleration;
-    public float airStrife;
+    public float airStrafe;
 
     private Vector3 movVector;
 
@@ -29,28 +29,27 @@ public class Player : MonoBehaviour
     }
 
     // Update is called once per frame
-    
     void Update()
     {
         // Lock mouse
         Cursor.lockState = CursorLockMode.Locked;
-        {
-            
-        };
+        
         // Fall Respawn
         if(playerGameObject.transform.position.y <= -10)
         {
             playerGameObject.transform.position = new Vector3(0,2,-4);
         }
-
+        
         // Jumping
         if(Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.AddForce(Vector3.up*jumpForce*10);
             isGrounded = false;
         }
-
+        
         // Look Control
+        // Vertical mouse input is tied to the camera vertical rotation
+        // Horizontal mouse input is tied to the player rotation, to preserve local movement.
         Vector3 r;
         Vector3 r2;
         r = new Vector3(Input.GetAxis("Mouse Y")*-1*viewSpeed,0,0);
@@ -59,19 +58,20 @@ public class Player : MonoBehaviour
         this.gameObject.transform.Rotate(r2);
     }
 
+    // FixedUpdate is called based on physics
     void FixedUpdate()
     {           
-        Debug.Log(rb.velocity.magnitude);
         // Player Movement
         float verticalAxis = Input.GetAxis("Vertical");
         float horizontalAxis = Input.GetAxis("Horizontal");
         if(isGrounded)
         {
-            rb.velocity = new Vector3(transform.forward.x*verticalAxis*speed,rb.velocity.y,transform.forward.z*verticalAxis*speed);
-            rb.AddForce(transform.right*horizontalAxis*speed,ForceMode.VelocityChange);
+            rb.velocity = new Vector3(transform.forward.x*verticalAxis*speed,rb.velocity.y,transform.forward.z*verticalAxis*speed); // Walk
+            rb.AddForce(transform.right*horizontalAxis*speed,ForceMode.VelocityChange); // Strafe
         }
     }
 
+    // Called when this object collide with another one
     void OnCollisionEnter(Collision col)
     {
         // Check if player is grounded
@@ -81,6 +81,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Called while this object is touching another object
     void OnCollisionStay(Collision col)
     {
         // Apply Ramp Gravity
@@ -89,10 +90,11 @@ public class Player : MonoBehaviour
             float verticalAxis = Input.GetAxis("Vertical");
             float horizontalAxis = Input.GetAxis("Horizontal");
             rb.AddForce(new Vector3(transform.forward.x*rampAcceleration,rampGravity,transform.forward.z*rampAcceleration),ForceMode.VelocityChange);
-            rb.AddForce(transform.right*horizontalAxis*airStrife,ForceMode.VelocityChange);
+            rb.AddForce(transform.right*horizontalAxis*airStrafe,ForceMode.VelocityChange);
         }
     }
 
+    // Called when this object isn't touching another one anymore
     void OnCollisionExit(Collision col)
     {
         // Check if player is grounded
@@ -100,11 +102,5 @@ public class Player : MonoBehaviour
         {
             isGrounded = false;
         }
-
-        // // Apply Ramp Gravity
-        // if(col.gameObject.tag == "Ramp")
-        // {
-        //     rb.AddForce(new Vector3(transform.forward.x*100,rampGravity,transform.forward.z*rb.velocity.magnitude));
-        // }
     }
 }
