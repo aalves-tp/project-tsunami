@@ -60,7 +60,7 @@ public class Player : MonoBehaviour
             if(rampAcceleration>-0.1)
             {
             rampAcceleration += playerView.transform.rotation.x*Time.deltaTime*inclinationMultiplier;
-            }else
+            }else if(rampAcceleration<0)
             {
                 rampAcceleration = 0;
             }
@@ -114,6 +114,12 @@ public class Player : MonoBehaviour
         if(col.gameObject.tag == "Ground")
         {
             isGrounded = true;
+        }
+
+        // Check if player has hit a wall
+        if(col.gameObject.tag == "Wall")
+        {
+            rb.velocity = Vector3.zero;
         }
     }
 
