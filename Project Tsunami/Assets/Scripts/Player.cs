@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     [Header("Movement and Camera")]
     public float speed;
     public Camera playerView;
+    public float playerViewRotation;
     public float viewSpeed;
     public float jumpForce;
     [SerializeField]
@@ -53,7 +54,33 @@ public class Player : MonoBehaviour
             rb.velocity = Vector3.zero;
             playerGameObject.transform.position = new Vector3(0,2,-4);
         }
-        
+        // Store player view rotation value to avoid getting it reversed and to clamp the view
+        playerViewRotation = Mathf.Clamp(playerViewRotation,-5,5); // clamp playerViewRotation
+        if(!GameSys.isPaused)
+        {
+            if(Input.GetAxis("Mouse Y") > 0)
+            {
+            playerViewRotation -= Input.GetAxis("Mouse Y");
+            }else if(Input.GetAxis("Mouse Y")< 0)
+            {
+            playerViewRotation -= Input.GetAxis("Mouse Y");
+            }
+        }
+
+        // Check if rotation value is reversed        
+        if(playerView.transform.rotation.x < 0 && playerViewRotation > 0)
+        {
+            if(inclinationMultiplier > 0)
+            {
+                inclinationMultiplier*=-1;
+            }
+        }else if(playerView.transform.rotation.x > 0 && playerViewRotation > 0)
+        {
+            if(inclinationMultiplier < 0)
+            {
+                inclinationMultiplier*=-1;
+            }
+        }
         // Ramp Speed Control
         if(onRamp)
         {
@@ -75,7 +102,8 @@ public class Player : MonoBehaviour
             Vector3 r2;
             r = new Vector3(Input.GetAxis("Mouse Y")*-1*viewSpeed*GameSys.mouseSensitivity,0,0);
             r2 = new Vector3(this.gameObject.transform.rotation.x,Input.GetAxis("Mouse X")*viewSpeed*GameSys.mouseSensitivity,this.gameObject.transform.rotation.z);
-            playerView.transform.Rotate(r);
+            if(playerViewRotation > -5 && playerViewRotation < 5) // Clamp vertical view rotation
+            {playerView.transform.Rotate(r);}
             this.gameObject.transform.Rotate(r2);
         }
     }

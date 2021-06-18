@@ -30,7 +30,8 @@ public class GameSys : MonoBehaviour
         mouseSensitivity = mouseSensitivtySlider.value;
         velocityDebug.text = "Player velocity: " +  player.velocity.magnitude.ToString() + "\n" +
                              "Ramp Acceleration: " + playerCode.rampAcceleration + "\n" +
-                             "Player Inclination: " + playerCode.playerView.transform.rotation.x + "\n" +
+                             "Player Inclination: " + playerCode.playerViewRotation + "\n" +
+                             "Ramp Exit Impulse: " + playerCode.rampExitImpulse + "\n" +
                              "Inclination Multiplier " + playerCode.inclinationMultiplier + "\n" +
                              "Ramp Strafe: " + playerCode.rampStrafe;
     }
@@ -50,5 +51,10 @@ public class GameSys : MonoBehaviour
 
         }
         return isPaused;
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }
