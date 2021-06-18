@@ -16,7 +16,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     bool onRamp;
     [Header("Physics and Collisions")]
-    public float rampGravity;
     public float rampAcceleration;
     public float airStrafe;
     public float rampStrafe;
@@ -30,6 +29,7 @@ public class Player : MonoBehaviour
     {
         rb = gameObject.GetComponent<Rigidbody>();
         playerGameObject = rb.gameObject;
+        playerViewRotation = 0;
     }
 
     // Update is called once per frame
@@ -55,7 +55,7 @@ public class Player : MonoBehaviour
             playerGameObject.transform.position = new Vector3(0,2,-4);
         }
         // Store player view rotation value to avoid getting it reversed and to clamp the view
-        playerViewRotation = Mathf.Clamp(playerViewRotation,-5,5); // clamp playerViewRotation
+        playerViewRotation = Mathf.Clamp(playerViewRotation,-5,6); // clamp playerViewRotation
         if(!GameSys.isPaused)
         {
             if(Input.GetAxis("Mouse Y") > 0)
@@ -66,43 +66,13 @@ public class Player : MonoBehaviour
             playerViewRotation -= Input.GetAxis("Mouse Y");
             }
         }
-
-        // Check if rotation value is reversed        
-        if(playerView.transform.rotation.x < 0 && playerViewRotation > 0)
-        {
-            if(inclinationMultiplier > 0)
-            {
-                inclinationMultiplier*=-1;
-            }
-        }else if(playerView.transform.rotation.x > 0 && playerViewRotation > 0)
-        {
-            if(inclinationMultiplier < 0)
-            {
-                inclinationMultiplier*=-1;
-            }
-        }
-        // Ramp Speed Control
-        if(onRamp)
-        {
-            if(rampAcceleration>-0.1)
-            {
-            rampAcceleration += playerView.transform.rotation.x*Time.deltaTime*inclinationMultiplier;
-            }else if(rampAcceleration<0)
-            {
-                rampAcceleration = 0;
-            }
-        }
-        
-        // Look Control
-        // Vertical mouse input is tied to the camera vertical rotation
-        // Horizontal mouse input is tied to the player rotation, to preserve local movement.
         if(!GameSys.isPaused)
         {
             Vector3 r;
             Vector3 r2;
             r = new Vector3(Input.GetAxis("Mouse Y")*-1*viewSpeed*GameSys.mouseSensitivity,0,0);
             r2 = new Vector3(this.gameObject.transform.rotation.x,Input.GetAxis("Mouse X")*viewSpeed*GameSys.mouseSensitivity,this.gameObject.transform.rotation.z);
-            if(playerViewRotation > -5 && playerViewRotation < 5) // Clamp vertical view rotation
+            if(playerViewRotation > -5 && playerViewRotation < 6) // Clamp vertical view rotation
             {playerView.transform.Rotate(r);}
             this.gameObject.transform.Rotate(r2);
         }
@@ -131,7 +101,8 @@ public class Player : MonoBehaviour
         if(!onRamp)
         {
         rb.AddForce(transform.right*horizontalAxis*airStrafe,ForceMode.VelocityChange);
-        rb.AddForce(transform.forward*rb.velocity.magnitude);
+        // rb.velocity = new Vector3(rb.velocity.x*airStrafe,rb.velocity.y,rb.velocity.z);
+        // rb.AddForce(transform.forward*rb.velocity.magnitude);
         }
     }
 
@@ -154,14 +125,18 @@ public class Player : MonoBehaviour
     // Called while this object is touching another object
     void OnCollisionStay(Collision col)
     {
-        // Apply Ramp Gravity
+        // Apply Ramp Physics
         if(col.gameObject.tag == "Ramp")
         {
             onRamp = true;
             float verticalAxis = Input.GetAxis("Vertical");
             float horizontalAxis = Input.GetAxis("Horizontal");
-            rb.AddForce(new Vector3(playerView.transform.forward.x*rampAcceleration,rampGravity,playerView.transform.forward.z*rampAcceleration),ForceMode.VelocityChange); // Ramp Acceleration
-            rb.AddForce(transform.right*horizontalAxis*rampStrafe,ForceMode.VelocityChange); // Ramp strafe
+            if(Input.GetAxis("Mouse Y") == 0)
+            {
+                rb.AddForce(transform.right*horizontalAxis*rampStrafe,ForceMode.VelocityChange); // Ramp strafe
+            }else{
+                rb.AddForce(transform.right*horizontalAxis*rampStrafe*(Input.GetAxis("Mouse Y")*inclinationMultiplier*10),ForceMode.VelocityChange); // Ramp strafe + mouse influence
+            }
         }
     }
 
