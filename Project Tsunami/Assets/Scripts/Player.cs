@@ -16,20 +16,22 @@ public class Player : MonoBehaviour
     [SerializeField]
     bool onRamp;
     [Header("Physics and Collisions")]
-    public float rampAcceleration;
     public float airStrafe;
     public float rampStrafe;
     public float inclinationMultiplier;
     public float rampExitImpulse;
+    [HideInInspector]
+    public Vector3 startPosition;
+    public float directionShiftModifier;
 
     private Vector3 movVector;
 
     // Start is called before the first frame update
     void Start()
     {
+        startPosition = transform.position;
         rb = gameObject.GetComponent<Rigidbody>();
         playerGameObject = rb.gameObject;
-        playerViewRotation = 0;
     }
 
     // Update is called once per frame
@@ -49,10 +51,10 @@ public class Player : MonoBehaviour
         }
         
         // Fall Respawn
-        if(playerGameObject.transform.position.y <= -25)
+        if(playerGameObject.transform.position.y <= -350)
         {
             rb.velocity = Vector3.zero;
-            playerGameObject.transform.position = new Vector3(0,2,-4);
+            playerGameObject.transform.position = startPosition;
         }
         // Store player view rotation value to avoid getting it reversed and to clamp the view
         playerViewRotation = Mathf.Clamp(playerViewRotation,-5,6); // clamp playerViewRotation
@@ -98,11 +100,18 @@ public class Player : MonoBehaviour
         }
 
         // Air Control
-        if(!onRamp)
+        if(!onRamp && !isGrounded)
         {
-        rb.AddForce(transform.right*horizontalAxis*airStrafe,ForceMode.VelocityChange);
-        // rb.velocity = new Vector3(rb.velocity.x*airStrafe,rb.velocity.y,rb.velocity.z);
-        // rb.AddForce(transform.forward*rb.velocity.magnitude);
+            if(horizontalAxis != 0)
+            {
+                rb.AddForce(playerView.transform.right*Input.GetAxisRaw("Mouse X")*airStrafe,ForceMode.VelocityChange);
+            }
+            // if(Input.GetAxis("Mouse X") != 0)
+            // {
+            //     Vector3 desiredDirection = transform.forward; // set this to the direction you want.
+            //     Vector3 newVelocity = desiredDirection.normalized * rb.velocity.magnitude;
+            //     rb.velocity = new Vector3(newVelocity.x,rb.velocity.y,newVelocity.z);
+            // }
         }
     }
 
@@ -113,12 +122,25 @@ public class Player : MonoBehaviour
         if(col.gameObject.tag == "Ground")
         {
             isGrounded = true;
+            airStrafe = 0;
+        }
+
+        // Check wall hits
+        if(col.gameObject.tag == "Wall")
+        {
+            airStrafe = 0;
         }
 
         // Check if player has hit a wall
         if(col.gameObject.tag == "Wall")
         {
             rb.velocity = Vector3.zero;
+        }
+
+        if(col.gameObject.tag == "Ramp")
+        {
+            rb.AddForce(transform.forward*playerViewRotation,ForceMode.VelocityChange);
+            airStrafe = 0;
         }
     }
 
@@ -131,11 +153,10 @@ public class Player : MonoBehaviour
             onRamp = true;
             float verticalAxis = Input.GetAxis("Vertical");
             float horizontalAxis = Input.GetAxis("Horizontal");
-            if(Input.GetAxis("Mouse Y") == 0)
+            rb.AddForce(transform.right*horizontalAxis*rampStrafe,ForceMode.VelocityChange); // Ramp strafe
+            if(Input.GetAxis("Mouse Y") > -1.5f && Input.GetAxis("Mouse Y") < 1.5f)
             {
-                rb.AddForce(transform.right*horizontalAxis*rampStrafe,ForceMode.VelocityChange); // Ramp strafe
-            }else{
-                rb.AddForce(transform.right*horizontalAxis*rampStrafe*(Input.GetAxis("Mouse Y")*inclinationMultiplier*10),ForceMode.VelocityChange); // Ramp strafe + mouse influence
+                rb.AddForce(transform.up*Input.GetAxis("Mouse Y")*inclinationMultiplier,ForceMode.VelocityChange);
             }
         }
     }
@@ -146,13 +167,24 @@ public class Player : MonoBehaviour
         if(col.gameObject.tag == "Ramp")
         {
             onRamp = false;
-            rampAcceleration = 0;
             rb.AddForce(playerView.transform.forward*rb.velocity.magnitude*rampExitImpulse*10);
+            airStrafe = 6;
         }
         // Check if player is grounded
         if(col.gameObject.tag == "Ground")
         {
             isGrounded = false;
         }
+    }
+
+    float MakePositive(float value)
+    {
+        if(value < 0 )
+        {
+            value *= -1;
+            return value;
+        }
+
+        return value;
     }
 }
