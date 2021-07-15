@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class GameSys : MonoBehaviour
 {
     [Header("Debug")]
-    public Text velocityDebug;
+    public GameObject statisticsBox;
+    public Text statisticsText;
     [Header("UI Elements")]
     public GameObject pauseMenu;
     public GameObject cheatBox;
@@ -22,6 +23,7 @@ public class GameSys : MonoBehaviour
     {
         mouseSensitivity = mouseSensitivtySlider.value;
         playerCode = player.GetComponent<Player>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -29,16 +31,25 @@ public class GameSys : MonoBehaviour
     {
         pauseMenu.SetActive(isPaused);
         mouseSensitivity = mouseSensitivtySlider.value;
-        velocityDebug.text = "Player velocity: " +  player.velocity.magnitude.ToString() + "\n" +
-                             "Player Inclination: " + playerCode.playerViewRotation + "\n" +
-                             "Ramp Exit Impulse: " + playerCode.rampExitImpulse + "\n" +
-                             "Inclination Multiplier " + playerCode.inclinationMultiplier + "\n" +
-                             "Air Strafe " + playerCode.airStrafe + "\n" +
-                             "Ramp Strafe: " + playerCode.rampStrafe;
+
+        statisticsText.text = 
+        "Current Velocity: " + playerCode.playerPhysics.velocity.magnitude.ToString("F2") + "\n" +
+        "Air Strafe: " + playerCode.airStrafe + "\n" +
+        "Air Acceleration: " + playerCode.airAcceleration + "\n" +
+        "Player View Orientation: " + playerCode.playerViewOrientation + "\n";
+
+        if(Input.GetButtonDown("Fire2"))
+        {
+            Pause();
+            statisticsBox.SetActive(false);
+        }
 
         if(Input.GetButtonDown("Cheat Menu") && isPaused)
         {
             cheatBox.SetActive(!cheatBox.activeSelf);
+        }else if(Input.GetButtonDown("Cheat Menu") && !isPaused)
+        {
+            statisticsBox.SetActive(!statisticsBox.activeSelf);
         }
 
         if(Input.GetButtonDown("Submit"))
@@ -54,9 +65,11 @@ public class GameSys : MonoBehaviour
         {
             case true:
             Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.None;
             break;
 
             case false:
+            Cursor.lockState = CursorLockMode.Locked;
             Time.timeScale = 1;
             break;
 
@@ -71,11 +84,7 @@ public class GameSys : MonoBehaviour
 
     public void ReadCheat(string cheat)
     {
-        if(cheat.ToLower() == "crick")
-        {
-            playerCode.playerViewRotation = 0;
-            cheatBox.SetActive(!cheatBox.activeSelf);
-        }else if(cheat.ToLower() == "homesick")
+        if(cheat.ToLower() == "homesick")
         {
             playerCode.transform.position = playerCode.startPosition;
             playerCode.GetComponent<Rigidbody>().velocity = Vector3.zero;
