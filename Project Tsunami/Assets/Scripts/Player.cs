@@ -80,7 +80,17 @@ public class Player : MonoBehaviour
                 {
                     if(playerViewOrientation > 5)
                     {
+                        GameSys.getRampPhysicsMaterial.dynamicFriction += 0.005f;
                         playerPhysics.AddForce(transform.right*speed*horizontalAxis*airStrafe); // Strafe + Mouse Influence
+                    }else{
+                        if(GameSys.getRampPhysicsMaterial.dynamicFriction > 0.01)
+                        {
+                            GameSys.getRampPhysicsMaterial.dynamicFriction -= 0.01f;
+                        }
+                        if(airAcceleration < 5)
+                        {
+                            airAcceleration+=0.1f;
+                        }
                     }
                 }
             }
@@ -119,11 +129,23 @@ public class Player : MonoBehaviour
         if(col.gameObject.tag == "Ramp")
         {
             onRamp = false;
+            GameSys.getRampPhysicsMaterial.dynamicFriction = 0;
+            airAcceleration = 1;
+            playerPhysics.AddForce(playerView.transform.forward*(100*PositiveFloat(mouseX)),ForceMode.Impulse);
         }
 
         if(col.gameObject.tag == "Wall")
         {
             playerPhysics.velocity = Vector3.zero;
         }
+    }
+
+    float PositiveFloat(float value)
+    {
+        if(value < 0)
+        {
+            value *= -1;
+        }
+        return value;
     }
 }

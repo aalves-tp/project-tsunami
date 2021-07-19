@@ -17,6 +17,10 @@ public class GameSys : MonoBehaviour
     public Rigidbody player;
     Player playerCode;
     public static float mouseSensitivity;
+    [Header("Physics")]
+    public PhysicMaterial rampPhysicsMaterial;
+    public static PhysicMaterial getRampPhysicsMaterial;
+
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +28,7 @@ public class GameSys : MonoBehaviour
         mouseSensitivity = mouseSensitivtySlider.value;
         playerCode = player.GetComponent<Player>();
         Cursor.lockState = CursorLockMode.Locked;
+        getRampPhysicsMaterial = rampPhysicsMaterial;
     }
 
     // Update is called once per frame
@@ -36,12 +41,18 @@ public class GameSys : MonoBehaviour
         "Current Velocity: " + playerCode.playerPhysics.velocity.magnitude.ToString("F2") + "\n" +
         "Air Strafe: " + playerCode.airStrafe + "\n" +
         "Air Acceleration: " + playerCode.airAcceleration + "\n" +
-        "Player View Orientation: " + playerCode.playerViewOrientation + "\n";
+        "Player View Orientation: " + playerCode.playerViewOrientation + "\n" +
+        "Ramp Friction: " + rampPhysicsMaterial.dynamicFriction + "\n";
 
         if(Input.GetButtonDown("Fire2"))
         {
             Pause();
-            statisticsBox.SetActive(false);
+            if(!isPaused)
+            {
+                statisticsBox.SetActive(true);
+            }else{
+                statisticsBox.SetActive(false);
+            }
         }
 
         if(Input.GetButtonDown("Cheat Menu") && isPaused)

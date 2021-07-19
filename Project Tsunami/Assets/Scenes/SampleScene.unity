@@ -1136,7 +1136,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 629309203}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: e934c0b8bd6b90042bd2e3af62972a25, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
@@ -1592,9 +1592,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 50582954}
   m_Direction: 0
   m_MinValue: 0
-  m_MaxValue: 1
+  m_MaxValue: 10
   m_WholeNumbers: 0
-  m_Value: 1
+  m_Value: 10
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1786,7 +1786,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1251637977}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: e934c0b8bd6b90042bd2e3af62972a25, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
@@ -2390,6 +2390,7 @@ MonoBehaviour:
   cheatBox: {fileID: 1809723561}
   mouseSensitivtySlider: {fileID: 848699790}
   player: {fileID: 2078025187}
+  rampPhysicsMaterial: {fileID: 13400000, guid: 7f77fbe96fab95846aa4622e7e7788e7, type: 2}
 --- !u!1 &1976316422
 GameObject:
   m_ObjectHideFlags: 0
@@ -2688,11 +2689,11 @@ MonoBehaviour:
   playerPhysics: {fileID: 0}
   startPosition: {x: 0, y: 0, z: 0}
   isGrounded: 0
-  airStrafe: 4
+  airStrafe: 8
   airAcceleration: 1
-  rampVerticalAngleModifier: 2
   playerViewOrientation: 0
   currentRamp: {fileID: 0}
+  jumpForce: 5
 --- !u!4 &2078025189
 Transform:
   m_ObjectHideFlags: 0
@@ -2735,7 +2736,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2102577511}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: a77a9353b5224964680d9b7d3456ceeb, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
