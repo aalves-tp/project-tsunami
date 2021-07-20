@@ -103,12 +103,18 @@ public class Player : MonoBehaviour
         playerView.transform.localRotation *= r2;
     }
 
+    void OnCollisionEnter(Collision col)
+    {
+
+    }
+    
     // Called while this object is touching another object
     void OnCollisionStay(Collision col)
     {
         if(col.gameObject.tag == "Ground")
         {
             isGrounded = true;
+            airAcceleration = 1;
         }
 
         if(col.gameObject.tag == "Ramp")
@@ -130,8 +136,6 @@ public class Player : MonoBehaviour
         {
             onRamp = false;
             GameSys.getRampPhysicsMaterial.dynamicFriction = 0;
-            airAcceleration = 1;
-            playerPhysics.AddForce(playerView.transform.forward*(100*PositiveFloat(mouseX)),ForceMode.Impulse);
         }
 
         if(col.gameObject.tag == "Wall")
