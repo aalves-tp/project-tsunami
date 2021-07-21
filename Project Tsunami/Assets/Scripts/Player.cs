@@ -40,7 +40,10 @@ public class Player : MonoBehaviour
         horizontalAxis = Input.GetAxisRaw("Horizontal");
         mouseX = Input.GetAxis("Mouse X");
         mouseY = Input.GetAxis("Mouse Y");
-        playerViewOrientation = (playerView.transform.localRotation.x*100)*-1;
+        if(currentRamp != null)
+        {
+            playerViewOrientation = ((playerView.transform.localRotation.x - currentRamp.transform.localRotation.x)*100)*-1;
+        }
 
         if(Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -71,11 +74,18 @@ public class Player : MonoBehaviour
             // Ramp Control
             if(onRamp)
             {
+                Debug.Log(PositiveFloat(currentRamp.transform.rotation.x));
                 // airAcceleration = Mathf.Lerp(airAcceleration,0.5f,Time.deltaTime/2);
                 // playerPhysics.AddForce(currentRamp.transform.right*speed*horizontalAxis*airStrafe); // Strafe + Mouse Influence
                 if(playerViewOrientation < 5 && playerViewOrientation > -5)
                 {
-                    playerPhysics.AddForce(transform.right*speed*horizontalAxis*(playerPhysics.velocity.y*-1)); // Strafe + Mouse Influence
+                    if(PositiveFloat(currentRamp.transform.rotation.x) < 0.1f)
+                    {
+                        playerPhysics.AddForce(transform.right*speed*horizontalAxis*(playerPhysics.velocity.y*-1)); // Strafe + Mouse Influence
+                    }else
+                    {
+                        // playerPhysics.AddForce(transform.right*(horizontalAxis/2)); // Strafe + Mouse Influence
+                    }
                 }else
                 {
                     if(playerViewOrientation > 5)
