@@ -50,11 +50,11 @@ public class Player : MonoBehaviour
             playerPhysics.AddForce(transform.up*jumpForce,ForceMode.Impulse);
         }
 
-        if(transform.position.y < -60)
-        {
-            transform.position = startPosition;
-            playerPhysics.velocity = Vector3.zero;
-        }
+        // if(transform.position.y < -60)
+        // {
+        //     transform.position = startPosition;
+        //     playerPhysics.velocity = Vector3.zero;
+        // }
     }
 
     // FixedUpdate is called based on Physics
@@ -90,9 +90,20 @@ public class Player : MonoBehaviour
                 {
                     if(playerViewOrientation > 5)
                     {
-                        GameSys.getRampPhysicsMaterial.dynamicFriction += 0.005f;
-                        playerPhysics.AddForce(transform.right*speed*horizontalAxis*airStrafe); // Strafe + Mouse Influence
+                        if(PositiveFloat(currentRamp.transform.rotation.x)< 0.1f)
+                        {
+                            GameSys.getRampPhysicsMaterial.dynamicFriction += 0.005f;
+                            playerPhysics.AddForce(transform.right*speed*horizontalAxis*airStrafe); // Strafe + Mouse Influence
+                        }else
+                        {
+                            playerPhysics.AddForce(transform.right*speed*horizontalAxis*airStrafe/2.5f); // Strafe + Mouse Influence
+                        }
                     }else{
+                        if(PositiveFloat(currentRamp.transform.rotation.x)> 0.1f)
+                        {
+                            playerPhysics.AddForce(transform.right*speed*horizontalAxis*airStrafe/1.5f); // Strafe + Mouse Influence
+                        }
+
                         if(GameSys.getRampPhysicsMaterial.dynamicFriction > 0.01)
                         {
                             GameSys.getRampPhysicsMaterial.dynamicFriction -= 0.01f;
